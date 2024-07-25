@@ -3,18 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Reservation } from './reservation.entity';
 import { CreateReservationDto } from './dto/create-reservation.dto';
-import { Restaurant } from '../restaurant/restaurant.entity';
-import { Client } from '../client/client.entity';
 
 @Injectable()
 export class ReservationService {
   constructor(
     @InjectRepository(Reservation)
     private reservationRepository: Repository<Reservation>,
-    @InjectRepository(Restaurant)
-    private restaurantRepository: Repository<Restaurant>,
-    @InjectRepository(Client)
-    private clientRepository: Repository<Client>,
   ) {}
 
   findAll(): Promise<Reservation[]> {
@@ -25,12 +19,11 @@ export class ReservationService {
     return this.reservationRepository.findOne({ where: { id }, relations: ['restaurant', 'client'] });
   }
 
-  async remove(id: number): Promise<void> {
-    await this.reservationRepository.delete(id);
+  create(reservation: Reservation): Promise<Reservation> {
+    return this.reservationRepository.save(reservation);
   }
 
-  async create(createReservationDto: CreateReservationDto): Promise<Reservation> {
-    const reservation = this.reservationRepository.create(createReservationDto);
-    return this.reservationRepository.save(reservation);
+  async remove(id: number): Promise<void> {
+    await this.reservationRepository.delete(id);
   }
 }

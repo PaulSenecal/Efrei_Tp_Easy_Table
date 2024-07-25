@@ -14,11 +14,11 @@ import { DataSource } from 'typeorm';
       inject: [ConfigService],
       useFactory: (configService: ConfigService): TypeOrmModuleOptions => ({
         type: 'postgres',
-        host: configService.get<string>('DATABASE_HOST'),
-        port: configService.get<number>('DATABASE_PORT'),
-        username: configService.get<string>('DATABASE_USER'),
-        password: configService.get<string>('DATABASE_PASSWORD'),
-        database: configService.get<string>('DATABASE_NAME'),
+        host: configService.get<string>('DB_HOST'),
+        port: configService.get<number>('DB_PORT'),
+        username: configService.get<string>('DB_USERNAME'),
+        password: configService.get<string>('DB_PASSWORD'),
+        database: configService.get<string>('DB_DATABASE'),
         autoLoadEntities: true,
         synchronize: true,
       }),
@@ -28,6 +28,4 @@ import { DataSource } from 'typeorm';
     ReservationModule,
   ],
 })
-export class AppModule {
-  constructor(private dataSource: DataSource) {}
-}
+export

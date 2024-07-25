@@ -1,3 +1,4 @@
+// src/reservation/reservation.service.ts
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -11,8 +12,10 @@ export class ReservationService {
   constructor(
     @InjectRepository(Reservation)
     private reservationRepository: Repository<Reservation>,
+
     @InjectRepository(Restaurant)
     private restaurantRepository: Repository<Restaurant>,
+
     @InjectRepository(Client)
     private clientRepository: Repository<Client>,
   ) {}
@@ -30,7 +33,20 @@ export class ReservationService {
   }
 
   async create(createReservationDto: CreateReservationDto): Promise<Reservation> {
-    const reservation = this.reservationRepository.create(createReservationDto);
+    const { restaurantId, clientId, date, numberOfPeople } = createReservationDto;
+
+    const restaurant = await this.restaurantRepository.findOne({ where: { id: restaurantId } });
+    const client = await this.clientRepository.findOne({ where: { id: clientId } });
+
+    const reservation = this.reservationRepository.create({
+      restaurantId,
+      clientId,
+      date,
+      numberOfPeople,
+      restaurant,
+      client,
+    });
+
     return this.reservationRepository.save(reservation);
   }
 }
