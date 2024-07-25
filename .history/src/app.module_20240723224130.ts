@@ -1,33 +1,30 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { RestaurantModule } from './restaurant/restaurant.module';
-import { ClientModule } from './client/client.module';
-import { ReservationModule } from './reservation/reservation.module';
-import { DataSource } from 'typeorm';
+import { Restaurant } from './restaurant.entity';
+import { Client } from './client.entity';
+import { Reservation } from './reservation/reservation.entity';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService): TypeOrmModuleOptions => ({
+      useFactory: (configService: ConfigService) => ({
         type: 'postgres',
         host: configService.get<string>('DATABASE_HOST'),
         port: configService.get<number>('DATABASE_PORT'),
         username: configService.get<string>('DATABASE_USER'),
         password: configService.get<string>('DATABASE_PASSWORD'),
         database: configService.get<string>('DATABASE_NAME'),
-        autoLoadEntities: true,
+        entities: [Restaurant, Client, Reservation],
         synchronize: true,
       }),
     }),
-    RestaurantModule,
-    ClientModule,
-    ReservationModule,
+    TypeOrmModule.forFeature([Restaurant, Client, Reservation]),
   ],
 })
-export class AppModule {
-  constructor(private dataSource: DataSource) {}
-}
+export class AppModule {}
